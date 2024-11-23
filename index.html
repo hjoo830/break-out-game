@@ -19,7 +19,8 @@
 
     #controls,
     #startButton,
-    #speedControls {
+    #speedControls,
+    #paddleControls {
       display: flex;
       justify-content: center;
       margin: 10px;
@@ -79,6 +80,12 @@
     <button onclick="adjustSpeed('fast')">빠르게</button>
   </div>
 
+  <div id="paddleControls">
+    <button onclick="adjustPaddleWidth('small')">좁게</button>
+    <button onclick="adjustPaddleWidth('normal')" class="selected">보통</button>
+    <button onclick="adjustPaddleWidth('wide')">넓게</button>
+  </div>
+
   <script>
     let canvas = document.getElementById("canvas");
     let ctx = canvas.getContext("2d");
@@ -121,6 +128,7 @@
         document.getElementById("controls").style.display = "flex";
       }
       document.getElementById("speedControls").style.display = "flex";
+      document.getElementById("paddleControls").style.display = "flex";
       game = setInterval(draw, 10);
     }
 
@@ -169,6 +177,35 @@
         dy = -4;
         fastButton.classList.add("selected");
       }
+    }
+
+    function adjustPaddleWidth(size) {
+      const smallButton = document.querySelector("#paddleControls button:nth-child(1)");
+      const normalButton = document.querySelector("#paddleControls button:nth-child(2)");
+      const wideButton = document.querySelector("#paddleControls button:nth-child(3)");
+
+      smallButton.classList.remove("selected");
+      normalButton.classList.remove("selected");
+      wideButton.classList.remove("selected");
+
+      const paddleCenter = paddleX + paddleWidth / 2;
+
+      if (size === "small") {
+        paddleWidth = canvas.width / 12;
+        smallButton.classList.add("selected");
+      } else if (size === "normal") {
+        paddleWidth = canvas.width / 6;
+        normalButton.classList.add("selected");
+      } else if (size === "wide") {
+        paddleWidth = canvas.width / 4;
+        wideButton.classList.add("selected");
+      }
+
+      paddleX = paddleCenter - paddleWidth / 2;
+      paddleX = Math.max(0, Math.min(paddleX, canvas.width - paddleWidth));
+
+      ctx.clearRect(0, canvas.height - paddleHeight - ballRadius, canvas.width, paddleHeight + ballRadius * 2);
+      drawPaddle();
     }
 
     function isMobile() {
