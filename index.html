@@ -11,6 +11,13 @@
       margin: 0;
     }
 
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
     canvas {
       background-color: #2C2C2C;
       display: block;
@@ -22,14 +29,43 @@
     #speedControls,
     #paddleControls {
       display: flex;
+      flex-direction: column;
       justify-content: center;
-      margin: 10px;
+      margin: 15px 0px;
+    }
+
+    #startButton {
+      width: 100%;
+    }
+
+    #controls {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      width: 100%;
+      gap: 10px;
+    }
+
+    #controls button {
+      width: 100%;
+    }
+
+    .controlsContainer {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .wrapContainer {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
 
     button {
-      padding: 10px 20px;
-      margin: 5px;
-      font-size: 16px;
+      padding: 8px 16px;
+      font-size: 15px;
       border: none;
       cursor: pointer;
       border-radius: 5px;
@@ -50,27 +86,37 @@
 
 <body>
   <canvas id="canvas"></canvas>
+  <div class="wrapContainer">
+    <div id="startButton">
+      <button onclick="startGame()">시작하기</button>
+    </div>
 
-  <div id="startButton">
-    <button onclick="startGame()">시작하기</button>
+    <div id="controls">
+      <button id="keyboardControl" class="selected" onclick="setControl('keyboard')">키보드로 움직이기</button>
+      <button id="mouseControl" onclick="setControl('mouse')">마우스로 움직이기</button>
+    </div>
+
+    <div class="controlsContainer">
+      <div id="speedControls">
+        <p>공 속도</p>
+        <div>
+          <button onclick="adjustSpeed('slow')">느림</button>
+          <button onclick="adjustSpeed('normal')" class="selected">기본</button>
+          <button onclick="adjustSpeed('fast')">빠름</button>
+        </div>
+      </div>
+
+      <div id="paddleControls">
+        <p>패들 너비</p>
+        <div>
+          <button onclick="adjustPaddleWidth('small')">좁게</button>
+          <button onclick="adjustPaddleWidth('normal')" class="selected">기본</button>
+          <button onclick="adjustPaddleWidth('wide')">넓게</button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div id="controls">
-    <button id="keyboardControl" class="selected" onclick="setControl('keyboard')">키보드로 움직이기</button>
-    <button id="mouseControl" onclick="setControl('mouse')">마우스로 움직이기</button>
-  </div>
-
-  <div id="speedControls">
-    <button onclick="adjustSpeed('slow')">느리게</button>
-    <button onclick="adjustSpeed('normal')" class="selected">보통</button>
-    <button onclick="adjustSpeed('fast')">빠르게</button>
-  </div>
-
-  <div id="paddleControls">
-    <button onclick="adjustPaddleWidth('small')">좁게</button>
-    <button onclick="adjustPaddleWidth('normal')" class="selected">보통</button>
-    <button onclick="adjustPaddleWidth('wide')">넓게</button>
-  </div>
 
   <script>
     let canvas = document.getElementById("canvas");
@@ -342,7 +388,6 @@
 
     const totalLives = 3;
     let lives = 3;
-
 
     function drawLives() {
       const heartFull = "❤️";
