@@ -33,9 +33,6 @@
       border: none;
       cursor: pointer;
       border-radius: 5px;
-    }
-
-    button {
       background-color: #A9CCE3;
       color: white;
     }
@@ -48,22 +45,11 @@
       background-color: #2D9CDB;
       color: white;
     }
-
-    @media screen and (max-width: 768px) {
-      canvas {
-        width: 100%;
-        height: auto;
-      }
-
-      #controls {
-        display: none !important;
-      }
-    }
   </style>
 </head>
 
 <body>
-  <canvas id="canvas" width="480" height="320"></canvas>
+  <canvas id="canvas"></canvas>
 
   <div id="startButton">
     <button onclick="startGame()">시작하기</button>
@@ -91,38 +77,70 @@
     let ctx = canvas.getContext("2d");
 
     let ballRadius = 10;
-    let x = canvas.width / 2;
-    let y = canvas.height - 30;
-    let dx = 2;
-    let dy = -2;
+    let x, y, dx, dy;
     let paddleHeight = 10;
     let paddleWidth = 75;
     let paddleX = (canvas.width - paddleWidth) / 2;
     let rightPressed = false;
     let leftPressed = false;
 
-    let brickRowCount = 5;
-    let brickColumnCount = 3;
-    let brickWidth = 75;
-    let brickHeight = 20;
+    let brickRowCount, brickColumnCount;
+    let brickWidth, brickHeight;
     let brickPadding = 10;
     let brickOffsetTop = 30;
     let brickOffsetLeft = 30;
 
     let score = 0;
     let game;
+    let isGameStarted = false;
 
     let bricks = [];
-    for (let c = 0; c < brickColumnCount; c++) {
-      bricks[c] = [];
-      for (let r = 0; r < brickRowCount; r++) {
-        bricks[c][r] = { x: 0, y: 0, status: 1 };
+
+    function initializeGame() {
+      resizeCanvas();
+      resetBallAndPaddle();
+      resetBricks();
+      draw();
+    }
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight * 0.7;
+
+      if (isMobile()) {
+        brickColumnCount = Math.floor(canvas.width / 80);
+        brickRowCount = Math.floor((canvas.height * 0.3) / 30);
+      } else {
+        brickColumnCount = Math.floor(canvas.width / 120);
+        brickRowCount = Math.floor((canvas.height * 0.3) / 40);
+      }
+    }
+
+    function resetBallAndPaddle() {
+      x = canvas.width / 2;
+      y = canvas.height - 30;
+      dx = 2;
+      dy = -2;
+      paddleWidth = canvas.width / 6;
+      paddleX = (canvas.width - paddleWidth) / 2;
+    }
+
+    function resetBricks() {
+      brickWidth = (canvas.width - brickOffsetLeft * 2 - brickPadding * (brickColumnCount - 1)) / brickColumnCount;
+      brickHeight = 20;
+      bricks = [];
+      for (let c = 0; c < brickColumnCount; c++) {
+        bricks[c] = [];
+        for (let r = 0; r < brickRowCount; r++) {
+          bricks[c][r] = { x: 0, y: 0, status: 1 };
+        }
       }
     }
 
     let controlMode = "keyboard";
 
     function startGame() {
+      isGameStarted = true;
       document.getElementById("startButton").style.display = "none";
       if (!isMobile()) {
         document.getElementById("controls").style.display = "flex";
@@ -212,10 +230,24 @@
       return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     }
 
+    function updateUI() {
+      const controls = document.getElementById("controls");
+      if (isMobile()) {
+        controls.style.display = "none";
+      } else {
+        controls.style.display = "flex";
+      }
+    }
+
     document.addEventListener("keydown", keyDownHandler, false);
     document.addEventListener("keyup", keyUpHandler, false);
     document.addEventListener("mousemove", mouseMoveHandler, false);
     document.addEventListener("touchmove", function (e) { e.preventDefault(); touchMoveHandler(e); }, { passive: false });
+
+    window.addEventListener("resize", () => {
+      initializeGame();
+      updateUI();
+    });
 
     function keyDownHandler(e) {
       if (e.code == "ArrowRight") {
@@ -288,8 +320,8 @@
       for (let c = 0; c < brickColumnCount; c++) {
         for (let r = 0; r < brickRowCount; r++) {
           if (bricks[c][r].status == 1) {
-            let brickX = (r * (brickWidth + brickPadding)) + brickOffsetLeft;
-            let brickY = (c * (brickHeight + brickPadding)) + brickOffsetTop;
+            const brickX = brickOffsetLeft + c * (brickWidth + brickPadding);
+            const brickY = brickOffsetTop + r * (brickHeight + brickPadding);
             bricks[c][r].x = brickX;
             bricks[c][r].y = brickY;
             ctx.beginPath();
@@ -316,33 +348,40 @@
       drawScore();
       collisionDetection();
 
-      if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
-        dx = -dx;
-      }
-      if (y + dy < ballRadius) {
-        dy = -dy;
-      }
-      else if (y + dy > canvas.height - ballRadius) {
-        if (x > paddleX && x < paddleX + paddleWidth) {
+      if (isGameStarted) {
+        if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+          dx = -dx;
+        }
+        if (y + dy < ballRadius) {
           dy = -dy;
         }
-        else {
-          clearInterval(game);
-          alert("GAME OVER");
-          document.location.reload();
+        else if (y + dy > canvas.height - ballRadius) {
+          if (x > paddleX && x < paddleX + paddleWidth) {
+            dy = -dy;
+          }
+          else {
+            clearInterval(game);
+            alert("GAME OVER");
+            document.location.reload();
+          }
         }
-      }
 
-      if (rightPressed && paddleX < canvas.width - paddleWidth) {
-        paddleX += 7;
-      }
-      else if (leftPressed && paddleX > 0) {
-        paddleX -= 7;
-      }
+        if (rightPressed && paddleX < canvas.width - paddleWidth) {
+          paddleX += 7;
+        }
+        else if (leftPressed && paddleX > 0) {
+          paddleX -= 7;
+        }
 
-      x += dx;
-      y += dy;
+        x += dx;
+        y += dy;
+      }
     }
+
+    window.onload = () => {
+      initializeGame();
+      updateUI();
+    };
   </script>
 </body>
 
