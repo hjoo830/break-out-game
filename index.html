@@ -87,7 +87,7 @@
     let brickRowCount, brickColumnCount;
     let brickWidth, brickHeight;
     let brickPadding = 10;
-    let brickOffsetTop = 30;
+    let brickOffsetTop = 50;
     let brickOffsetLeft = 30;
 
     let score = 0;
@@ -340,12 +340,34 @@
       ctx.fillText("Score: " + score, 8, 20);
     }
 
+    const totalLives = 3;
+    let lives = 3;
+
+
+    function drawLives() {
+      const heartFull = "❤️";
+      const heartBroken = "💔";
+      const heartSize = 24;
+      const startX = canvas.width - (heartSize * totalLives) - 8;
+      const startY = 10;
+
+      ctx.font = "20px Arial";
+      ctx.textAlign = "start";
+      ctx.textBaseline = "top";
+
+      for (let i = 0; i < totalLives; i++) {
+        const heart = i < lives ? heartFull : heartBroken;
+        ctx.fillText(heart, startX + i * heartSize, startY);
+      }
+    }
+
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawBricks();
       drawBall();
       drawPaddle();
       drawScore();
+      drawLives();
       collisionDetection();
 
       if (isGameStarted) {
@@ -360,9 +382,17 @@
             dy = -dy;
           }
           else {
-            clearInterval(game);
-            alert("GAME OVER");
-            document.location.reload();
+            lives--;
+            if (!lives) {
+              alert("GAME OVER");
+              document.location.reload();
+            }
+            else {
+              x = canvas.width / 2;
+              y = canvas.height - 30;
+              dx = 2;
+              dy = -2;
+            }
           }
         }
 
