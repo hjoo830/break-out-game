@@ -17,10 +17,45 @@
       margin: 0 auto;
     }
 
+    #controls,
+    #startButton {
+      display: flex;
+      justify-content: center;
+      margin: 10px;
+    }
+
+    #controls button,
+    #startButton button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    #controls button {
+      background-color: #A9CCE3;
+      color: white;
+    }
+
+    #controls button.selected {
+      background-color: #2D9CDB;
+    }
+
+    #startButton button {
+      background-color: #2D9CDB;
+      color: white;
+    }
+
     @media screen and (max-width: 768px) {
       canvas {
         width: 100%;
         height: auto;
+      }
+
+      #controls {
+        display: none !important;
       }
     }
   </style>
@@ -28,6 +63,15 @@
 
 <body>
   <canvas id="canvas" width="480" height="320"></canvas>
+
+  <div id="startButton">
+    <button onclick="startGame()">시작하기</button>
+  </div>
+
+  <div id="controls">
+    <button id="keyboardControl" class="selected" onclick="setControl('keyboard')">키보드로 움직이기</button>
+    <button id="mouseControl" onclick="setControl('mouse')">마우스로 움직이기</button>
+  </div>
 
   <script>
     let canvas = document.getElementById("canvas");
@@ -53,6 +97,7 @@
     let brickOffsetLeft = 30;
 
     let score = 0;
+    let game;
 
     let bricks = [];
     for (let c = 0; c < brickColumnCount; c++) {
@@ -60,6 +105,43 @@
       for (let r = 0; r < brickRowCount; r++) {
         bricks[c][r] = { x: 0, y: 0, status: 1 };
       }
+    }
+
+    let controlMode = "keyboard";
+
+    function startGame() {
+      document.getElementById("startButton").style.display = "none";
+      if (!isMobile()) {
+        document.getElementById("controls").style.display = "flex";
+      }
+      game = setInterval(draw, 10);
+    }
+
+    function setControl(mode) {
+      controlMode = mode;
+
+      const mouseButton = document.getElementById("mouseControl");
+      const keyboardButton = document.getElementById("keyboardControl");
+
+      if (mode === "keyboard") {
+        mouseButton.classList.remove("selected");
+        keyboardButton.classList.add("selected");
+
+        document.addEventListener("keydown", keyDownHandler, false);
+        document.addEventListener("keyup", keyUpHandler, false);
+        document.removeEventListener("mousemove", mouseMoveHandler, false);
+      } else if (mode === "mouse") {
+        keyboardButton.classList.remove("selected");
+        mouseButton.classList.add("selected");
+
+        document.addEventListener("mousemove", mouseMoveHandler, false);
+        document.removeEventListener("keydown", keyDownHandler, false);
+        document.removeEventListener("keyup", keyUpHandler, false);
+      }
+    }
+
+    function isMobile() {
+      return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     }
 
     document.addEventListener("keydown", keyDownHandler, false);
@@ -84,6 +166,7 @@
       }
     }
     function mouseMoveHandler(e) {
+      if (controlMode !== "mouse") return;
       let relativeX = e.clientX - canvas.offsetLeft;
       if (relativeX > 0 && relativeX < canvas.width) {
         paddleX = relativeX - paddleWidth / 2;
@@ -192,8 +275,6 @@
       x += dx;
       y += dy;
     }
-
-    let game = setInterval(draw, 10);
   </script>
 </body>
 
