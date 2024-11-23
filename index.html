@@ -389,22 +389,28 @@
     const totalLives = 3;
     let lives = 3;
 
+    const heartFullImg = new Image();
+    heartFullImg.src = "assets/red-heart.png";
+    const heartBrokenImg = new Image();
+    heartBrokenImg.src = "assets/broken-heart.png";
+
     function drawLives() {
-      const heartFull = "❤️";
-      const heartBroken = "💔";
       const heartSize = 24;
-      const startX = canvas.width - (heartSize * totalLives) - 8;
+      const startX = canvas.width - (heartSize * totalLives) - 15;
       const startY = 10;
 
-      ctx.font = "20px Arial";
-      ctx.textAlign = "start";
-      ctx.textBaseline = "top";
-
-      for (let i = 0; i < totalLives; i++) {
-        const heart = i < lives ? heartFull : heartBroken;
-        ctx.fillText(heart, startX + i * heartSize, startY);
+      if (heartFullImg.complete && heartBrokenImg.complete) {
+        for (let i = 0; i < totalLives; i++) {
+          const heartImg = i < lives ? heartFullImg : heartBrokenImg;
+          ctx.drawImage(heartImg, startX + i * (heartSize + 3), startY, heartSize, heartSize);
+        }
       }
     }
+
+    heartFullImg.onload = heartBrokenImg.onload = function () {
+      drawLives();
+    };
+
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
