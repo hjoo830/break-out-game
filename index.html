@@ -18,14 +18,14 @@
     }
 
     #controls,
-    #startButton {
+    #startButton,
+    #speedControls {
       display: flex;
       justify-content: center;
       margin: 10px;
     }
 
-    #controls button,
-    #startButton button {
+    button {
       padding: 10px 20px;
       margin: 5px;
       font-size: 16px;
@@ -34,12 +34,12 @@
       border-radius: 5px;
     }
 
-    #controls button {
+    button {
       background-color: #A9CCE3;
       color: white;
     }
 
-    #controls button.selected {
+    button.selected {
       background-color: #2D9CDB;
     }
 
@@ -71,6 +71,12 @@
   <div id="controls">
     <button id="keyboardControl" class="selected" onclick="setControl('keyboard')">키보드로 움직이기</button>
     <button id="mouseControl" onclick="setControl('mouse')">마우스로 움직이기</button>
+  </div>
+
+  <div id="speedControls">
+    <button onclick="adjustSpeed('slow')">느리게</button>
+    <button onclick="adjustSpeed('normal')" class="selected">보통</button>
+    <button onclick="adjustSpeed('fast')">빠르게</button>
   </div>
 
   <script>
@@ -114,6 +120,7 @@
       if (!isMobile()) {
         document.getElementById("controls").style.display = "flex";
       }
+      document.getElementById("speedControls").style.display = "flex";
       game = setInterval(draw, 10);
     }
 
@@ -137,6 +144,30 @@
         document.addEventListener("mousemove", mouseMoveHandler, false);
         document.removeEventListener("keydown", keyDownHandler, false);
         document.removeEventListener("keyup", keyUpHandler, false);
+      }
+    }
+
+    function adjustSpeed(speed) {
+      const slowButton = document.querySelector("#speedControls button:nth-child(1)");
+      const normalButton = document.querySelector("#speedControls button:nth-child(2)");
+      const fastButton = document.querySelector("#speedControls button:nth-child(3)");
+
+      slowButton.classList.remove("selected");
+      normalButton.classList.remove("selected");
+      fastButton.classList.remove("selected");
+
+      if (speed === "slow") {
+        dx = 1;
+        dy = -1;
+        slowButton.classList.add("selected");
+      } else if (speed === "normal") {
+        dx = 2;
+        dy = -2;
+        normalButton.classList.add("selected");
+      } else if (speed === "fast") {
+        dx = 4;
+        dy = -4;
+        fastButton.classList.add("selected");
       }
     }
 
