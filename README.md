@@ -4,8 +4,9 @@ HTML5 Canvas와 JavaScript를 활용하여 만든 벽돌깨기 게임이다. 데
 
 ## 🖼️ 시연
 
-- 데스크탑
-- 모바일
+| 데스크탑 | 모바일|
+|---|---|
+|![breakout-desktop](https://github.com/user-attachments/assets/23362096-b593-41b5-9016-18dc1945692a) | ![breakout-mobile](https://github.com/user-attachments/assets/221801e7-af87-4be9-be4d-1ee5ab59737a)|
 
 ## 🕹️ 주요 기능
 
